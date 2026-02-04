@@ -1,4 +1,5 @@
 import { Apple, CirclePile, LayoutDashboardIcon, PackageSearch, Receipt, Settings, ShoppingCart, User, UserPen } from "lucide-react";
+import Link from "next/link";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 
 const posItems = [
@@ -64,10 +65,10 @@ export default function AppSidebar() {
               {posItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={`/admin${item.url}`}>
+                    <Link href={`/admin${item.url}`}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -81,10 +82,10 @@ export default function AppSidebar() {
               {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={`/admin${item.url}`}>
+                    <Link href={`/admin${item.url}`}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

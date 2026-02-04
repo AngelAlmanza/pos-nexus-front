@@ -2,80 +2,110 @@
 
 import { productCategoriesSchema, ProductCategorySchema } from "@/schemas/product-categories"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRef } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { Button } from "../ui/button"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 
-export const ProductCategoryForm = () => {
-  const submitButtonRef = useRef<HTMLButtonElement>(null)
+const FORM_ID = "product-category-form"
 
+const defaultValues = {
+  name: "",
+  description: ""
+}
+
+export const ProductCategoryForm = () => {
   const form = useForm<ProductCategorySchema>({
     resolver: zodResolver(productCategoriesSchema),
-    defaultValues: {
-      name: "",
-      description: ""
-    }
+    defaultValues
   })
-
-  const handleSubmit = () => {
-    submitButtonRef.current?.click()
-  }
 
   const onSubmit = (data: ProductCategorySchema) => {
     console.log(data)
   }
 
+  const handleCancel = () => {
+    form.reset(defaultValues)
+  }
+
   return (
-    <Dialog>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <DialogTrigger asChild>
-            <Button variant="outline">Open Dialog</Button>
-          </DialogTrigger>
-          <DialogContent aria-describedby="Product Category Form">
-            <DialogHeader>
-              <DialogTitle>Create Product Category</DialogTitle>
-            </DialogHeader>
-            <FormField
+    <Dialog onOpenChange={(open) => {
+      if (!open) {
+        handleCancel()
+      }
+    }}
+    >
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Product Category</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Product Category</DialogTitle>
+        </DialogHeader>
+
+        <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
               control={form.control}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Category name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={`${FORM_ID}-name`}>
+                    Name
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={`${FORM_ID}-name`}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Category name"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
             />
-            <FormField
+
+            <Controller
               control={form.control}
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Category description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={`${FORM_ID}-description`}>
+                    Description
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    id={`${FORM_ID}-description`}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
             />
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleSubmit}>Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-          <button ref={submitButtonRef} type="submit" className="hidden" />
+          </FieldGroup>
         </form>
-      </Form>
+
+        <DialogFooter>
+          <Field orientation="horizontal" className="justify-end">
+            <DialogClose asChild>
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit" form={FORM_ID}>
+              Save changes
+            </Button>
+          </Field>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   )
 }
